@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shopping Cart</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <h1>Online Shopping Cart</h1>
+
+  <form id="addItemForm" enctype="multipart/form-data">
+    <label for="itemName">Name:</label>
+    <input type="text" id="itemName" name="name" required>
+
+    <label for="itemPrice">Price:</label>
+    <input type="number" id="itemPrice" name="price" min="0" required>
+
+    <label for="itemQuantity">Quantity:</label>
+    <input type="number" id="itemQuantity" name="quantity" min="1" required>
+
+    <label for="itemImage">Image:</label>
+    <input type="file" id="itemImage" name="image" accept="image/*">
+
+    <button type="submit">Add to Cart</button>
+  </form>
+
+  <hr>
+
+  <h2>Cart Contents</h2>
+  <div id="cartContents">
+
+  </div>
+
+  <hr>
+
+  <h2>Total Price</h2>
+  <div id="totalPrice"></div>
+
+  <script>
+    document.getElementById('addItemForm').addEventListener('submit', async function (event) {
+      event.preventDefault();
+
+      const formData = new FormData(this);
+      console.log(event.target.value)
+
+      try {
+        const response = await fetch('http://localhost:3000/add', {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (response.ok) {
+          alert('Item added to the cart!');
+          updateCart();
+        } else {
+          alert('Failed to add item to the cart.');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    });
+
+    async function updateCart() {
+      try {
+        const response = await fetch('http://localhost:3000/view');
+        console.log(response)
+        const cartContents = await response.text();
+        // const cartContents = await response.
+
+        document.getElementById('cartContents').innerHTML = cartContents;
+        updateTotalPrice();
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    }
+
+    async function updateTotalPrice() {
+      try {
+        const response = await fetch('/total');
+        const totalPrice = await response.text();
+
+        document.getElementById('totalPrice').innerHTML = totalPrice;
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    }
+
+    updateCart();
+  </script>
+</body>
+</html>
