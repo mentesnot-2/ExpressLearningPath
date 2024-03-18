@@ -21,7 +21,7 @@ const addTasks = async (req:Request,res:Response):Promise<void> => {
         const task:ITask = new Task({
             title:req.body.title,
             description:req.body.description,
-            // status:req.body.status,
+            status:req.body.status,
         });
         const newTask:ITask = await Task.create(task);
         res.status(200).json({
