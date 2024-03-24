@@ -1,14 +1,20 @@
 import express from 'express';
 import bodyParser from 'body-parser';
-import router from './routes/routes';
 import mongoose from 'mongoose';
-import { errorHandler } from './middleware/errorHandlerMiddleWare';
-
-
+import { authRouter, userRouter } from './routes';
+import cookieParser from 'cookie-parser';
 
 const app = express();
+app.use(cookieParser());
 app.use(bodyParser.json());
-app.use('/api',router);
+app.use("/auth",authRouter);
+app.use("/user",userRouter);
+app.use("/*",(req,res) => {
+    res.status(404).json({
+        message:"path Not Found"
+    })
+}
+)
 
 const PORT  = 3000;
 mongoose.connect('mongodb://localhost:27017/simpleTodo')
