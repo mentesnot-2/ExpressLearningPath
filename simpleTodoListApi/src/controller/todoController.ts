@@ -8,9 +8,16 @@ export const createTodo = async (req:any,res:Response) :Promise<void> => {
     
     try {
         const {error} = TodoSchema.validate(req.body);
-
+        const {title} = req.body;
+        const existingTodo = await Todo.findOne({title});
+        if (existingTodo) {
+            res.status(409).json({
+                message:"Todo already exists"
+            })
+            return;
+        }
         if (error) {
-            res.status(400).json({error:error.details[0].message,here:"Here is the error"});
+            res.status(400).json({error:error.details[0].message});
             return;
         }
         
@@ -38,7 +45,6 @@ export const createTodo = async (req:any,res:Response) :Promise<void> => {
         res.status(500).json(
             {
                 error,
-                message:"Something went wrong"
             }
         )
     }
@@ -53,7 +59,7 @@ export const getTodo = async (req:any,res:Response) :Promise<void> => {
 
         if (!todo) {
             res.status(404).json({
-                todo:" Todo not found"
+                todo:" Todo Not Found"
             });
             return
         }
