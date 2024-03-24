@@ -110,7 +110,8 @@ export const deleteTodo = async (req:any,res:Response):Promise<void> => {
         const deletedTodo =   await Todo.findByIdAndDelete(id);
         res.status(200).json({
             status:true,
-            message:"Todo Deleted Successfully"
+            message:"Todo Deleted Successfully",
+            deletedTodo
         })
     } catch (error) {
         res.status(500).json({
