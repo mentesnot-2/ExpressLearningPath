@@ -62,15 +62,13 @@ export const login = async (req:Request,res:Response):Promise<void> => {
             
 
             res.status(200).json({
-                name,
+                message:"Login Successful",
                 token
             });
 
         }
     } catch (error:any) {
-
         res.status(500).json({ error: error.message });
-
     }
     
 }

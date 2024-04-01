@@ -4,49 +4,58 @@ import Todo from '../model/todoModel';
 import { TodoModel } from '../model/todoModel';
 import User from '../model/userModel';
 
-export const createTodo = async (req:any,res:Response) :Promise<void> => {
-    
+export const createTodo = async (req: Request, res: Response): Promise<void> => {
     try {
-        const {error} = TodoSchema.validate(req.body);
-        const {title} = req.body;
-        const existingTodo = await Todo.findOne({title});
+        const { title, description } = req.body;
+        const userId = req.cookies.user_id;
+
+        if (!userId) {
+            res.status(401).json({
+                message: "User not authenticated"
+            });
+            return;
+        }
+
+        if (!title || !description) {
+            res.status(400).json({
+                error: 'Invalid title or description'
+            });
+            return; // Return after sending response
+        }
+
+        const existingTodo = await Todo.findOne({ title });
+
         if (existingTodo) {
             res.status(409).json({
-                message:"Todo already exists"
-            })
-            return;
+                message: "Todo already exists"
+            });
+            return; // Return after sending response
         }
-        if (error) {
-            res.status(400).json({error:error.details[0].message});
-            return;
-        }
-        
-        const userId = req.cookies.user_id;
+
         const user = await User.findById(userId);
+
         if (!user) {
             res.status(404).json({
-                message:"User not found"
-            })
-            return;
+                message: "User not found"
+            });
+            return; // Return after sending response
         }
+
         const todo = new Todo({
             ...req.body,
-            userId:userId
+            userId: userId
         });
-                
-        
+
         const newTodo = await todo.save();
-        
+
         res.status(201).json({
-            newTodo
-        })
-        
-    } catch (error) {
-        res.status(500).json(
-            {
-                error,
-            }
-        )
+            message: "Todo Created Successfully"
+        });
+
+    } catch (error:any) {
+        res.status(500).json({
+            error: error.message // Adjust to send error message instead of full error object
+        });
     }
 };
 
@@ -87,6 +96,7 @@ export const getAllTodos = async (req:any,res:Response):Promise<void> => {
     }
 };
 
+
 export const deleteTodo = async (req:any,res:Response):Promise<void> => {
     try {
         const id = req.params.id
@@ -118,7 +128,9 @@ export const deleteTodo = async (req:any,res:Response):Promise<void> => {
             message:'Something Went Wrong'
         })
     }
-}
+};
+
+
 
 export const updateTodo = async (req:any,res:Response):Promise<void> => {
     try {
@@ -131,6 +143,7 @@ export const updateTodo = async (req:any,res:Response):Promise<void> => {
             })
             return;
         }
+        
         const updatedFields: Partial<TodoModel> = {};
         if (req.body.title) updatedFields.title = req.body.title;
         if (req.body.description) updatedFields.description = req.body.description;
@@ -153,4 +166,4 @@ export const updateTodo = async (req:any,res:Response):Promise<void> => {
             message:'Something Went Wrong'
         })
     }
-}
+};

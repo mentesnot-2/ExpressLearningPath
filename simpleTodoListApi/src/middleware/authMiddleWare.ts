@@ -11,8 +11,18 @@ export const verifyToken = (req:any,res:Response,next:NextFunction) => {
                 message:"No Token Provided"
             })
         }
-        const decodeToken = jwt.verify(token,config.jwtSecret);
-        // req.userData = decodeToken;
+        jwt.verify(token,config.jwtSecret,(err:any,decoded:any) => {
+            if (err) {
+                res.status(400).json({
+                    message:"Invalid Token"
+                });
+            }
+            req.user = {
+                id:decoded.id,
+                role:decoded.role
+            }
+        });
+        
         next()
     } catch (error) {
         res.status(401).send({

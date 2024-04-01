@@ -16,7 +16,7 @@ app.use("/*",(req,res) => {
 }
 )
 
-const PORT  = 3000;
+const PORT  = 3001;
 mongoose.connect('mongodb://localhost:27017/simpleTodo')
     .then(() => {
         app.listen(PORT, () => {
@@ -26,3 +26,4 @@ mongoose.connect('mongodb://localhost:27017/simpleTodo')
     .catch(error => {
         console.error('Failed to connect to MongoDB:', error);
     });
+export default app;
